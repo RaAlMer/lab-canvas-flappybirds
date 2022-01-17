@@ -7,16 +7,22 @@ bgImg.src = "../images/bg.png";
 const flappyImg = new Image();
 flappyImg.src = "../images/flappy.png";
 
+const obsBottom = new Image();
+obsBottom.src = '../images/obstacle_bottom.png';
+
+const obsTop = new Image();
+obsTop.src = '../images/obstacle_top.png';
+
 const obstacles = [];
 let frame = 0;
 
 class Obstacle {
-  constructor(argX, argY, argWidth, argHeight, argColor) {
+  constructor(argX, argY, argWidth, argHeight, argImg) {
     this.x = argX;
     this.y = argY;
     this.width = argWidth;
     this.height = argHeight;
-    this.color = argColor;
+    this.image = argImg;
     this.speedX = -4;
   }
 
@@ -26,8 +32,7 @@ class Obstacle {
 
   draw() {
     this.move();
-    ctx.fillStyle = this.color;
-    ctx.fillRect(this.x, this.y, this.width, this.height);
+    ctx.drawImage(this.image, this.x, this.y, this.width, this.height);
   }
 
   left() {
@@ -147,16 +152,16 @@ function updateObstacles() {
   });
   frame++;
   if (frame % 100 === 0) {
-    const gap = randomIntFromInterval(130, 150);
+    const gap = randomIntFromInterval(160, 180);
     const gapPos = randomIntFromInterval(50, 300);
     obstacles.push(
-      new Obstacle(canvas.width, 0, 50, gapPos, "green"),
+      new Obstacle(canvas.width, 0, 100, gapPos, obsTop),
       new Obstacle(
         canvas.width,
         gapPos + gap,
-        50,
+        100,
         canvas.height - gapPos - gap,
-        "green"
+        obsBottom
       )
     );
   }
