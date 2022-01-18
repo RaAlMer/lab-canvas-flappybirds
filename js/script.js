@@ -16,6 +16,7 @@ obsTop.src = '../images/obstacle_top.png';
 const obstacles = [];
 let frame = 0;
 let myInterval = 0;
+let score = 0;
 
 class Obstacle {
   constructor(argX, argY, argWidth, argHeight, argImg) {
@@ -25,6 +26,7 @@ class Obstacle {
     this.height = argHeight;
     this.image = argImg;
     this.speedX = -4;
+    this.notScored = true;
   };
   move() {
     this.x += this.speedX;
@@ -82,7 +84,7 @@ const flappy = {
   },
   update: function () {
     if (this.jump) {
-      this.gravitySpeed = -8;
+      this.gravitySpeed = -6;
     } else {
       this.gravitySpeed += this.gravity;
     }
@@ -112,6 +114,12 @@ const flappy = {
       this.bottom() > obstacle.top()
     );
   },
+  scoreAdd: function(obstacle){
+    if (this.left() >= obstacle.right() && obstacle.notScored === true){
+      score += 0.5;
+      obstacle.notScored = false;
+    };
+  },
 };
 
 window.onload = function () {
@@ -129,6 +137,12 @@ function startGame() {
     flappy.draw();
     checkForCollision();
     outOfBounds();
+    obstacles.forEach(obstacle => {
+      flappy.scoreAdd(obstacle);
+    });
+    ctx.fillStyle = 'white';
+    ctx.font = "40px Arial";
+    ctx.fillText(score, 800, 80);
   }, 20);
 }
 
@@ -147,7 +161,7 @@ function updateObstacles() {
   });
   frame++;
   if (frame % 100 === 0) {
-    const gap = randomIntFromInterval(160, 180);
+    const gap = randomIntFromInterval(180, 200);
     const gapPos = randomIntFromInterval(50, 300);
     obstacles.push(
       new Obstacle(canvas.width, 0, 100, gapPos, obsTop),
