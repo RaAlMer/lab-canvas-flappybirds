@@ -15,6 +15,7 @@ obsTop.src = '../images/obstacle_top.png';
 
 const obstacles = [];
 let frame = 0;
+let myInterval = 0;
 
 class Obstacle {
   constructor(argX, argY, argWidth, argHeight, argImg) {
@@ -24,32 +25,26 @@ class Obstacle {
     this.height = argHeight;
     this.image = argImg;
     this.speedX = -4;
-  }
-
+  };
   move() {
     this.x += this.speedX;
-  }
-
+  };
   draw() {
     this.move();
     ctx.drawImage(this.image, this.x, this.y, this.width, this.height);
-  }
-
+  };
   left() {
     return this.x;
-  }
-
+  };
   right() {
     return this.x + this.width;
-  }
-
+  };
   top() {
     return this.y;
-  }
-
+  };
   bottom() {
     return this.y + this.height;
-  }
+  };
 }
 
 const bgImgAnime = {
@@ -110,11 +105,11 @@ const flappy = {
     return this.y + this.height();
   },
   collision: function (obstacle) {
-    return !(
-      this.bottom() < obstacle.top() ||
-      this.top() > obstacle.bottom() ||
-      this.right() < obstacle.left() ||
-      this.left() > obstacle.right()
+    return (
+      this.left() < obstacle.right() &&
+      this.right() > obstacle.left() &&
+      this.top() < obstacle.bottom() &&
+      this.bottom() > obstacle.top()
     );
   },
 };
@@ -127,12 +122,13 @@ window.onload = function () {
 };
 
 function startGame() {
-  setInterval(() => {
+  myInterval = setInterval(() => {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     bgImgAnime.draw();
     updateObstacles();
     flappy.draw();
     checkForCollision();
+    outOfBounds();
   }, 20);
 }
 
@@ -140,10 +136,9 @@ function checkForCollision() {
   const collision = obstacles.some((obstacle) => {
     return flappy.collision(obstacle);
   });
-
   if (collision) {
-    console.log(collision);
-  }
+    clearInterval(myInterval);
+  };
 }
 
 function updateObstacles() {
@@ -165,6 +160,12 @@ function updateObstacles() {
       )
     );
   }
+}
+
+function outOfBounds() {
+  if (flappy.top() <= 0 || flappy.bottom() >= 504){
+    clearInterval(myInterval);
+  };
 }
 
 function randomIntFromInterval(min, max) {
